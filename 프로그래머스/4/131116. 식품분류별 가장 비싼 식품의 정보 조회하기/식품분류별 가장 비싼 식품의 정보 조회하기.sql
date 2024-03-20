@@ -1,0 +1,21 @@
+# SELECT CATEGORY, PRICE AS MAX_PRICE, PRODUCT_NAME
+# FROM (
+#     SELECT *,
+#            ROW_NUMBER() OVER (PARTITION BY CATEGORY ORDER BY PRICE DESC) AS row_num
+#     FROM FOOD_PRODUCT
+#     WHERE CATEGORY IN ('과자','국','김치','식용유')
+# ) AS ranked
+# WHERE row_num = 1
+# ORDER BY MAX_PRICE DESC;
+
+WITH ms as (SELECT CATEGORY,MAX(PRICE) as MXP
+                    FROM FOOD_PRODUCT
+                    GROUP BY 1)
+
+SELECT a.CATEGORY, PRICE AS MAX_PRICE, PRODUCT_NAME
+FROM FOOD_PRODUCT as a, ms # 알아서 INNER JOIN이 들어가나보네?
+WHERE a.CATEGORY = ms.CATEGORY
+AND a.CATEGORY in ('과자', '국', '김치', '식용유')
+AND PRICE = ms.MXP
+GROUP BY 1
+ORDER BY 2 desc
